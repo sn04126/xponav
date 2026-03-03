@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Indoor Location API Tester</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="mb-4 text-center">AR Indoor Location API Tester</h1>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Authentication</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Auth Token</label>
+                            <input type="text" id="authToken" class="form-control" placeholder="Token">
+                        </div>
+                        <hr>
+                        <h6>Quick Login</h6>
+                        <input type="email" id="loginEmail" class="form-control mb-2" value="admin@example.com">
+                        <input type="password" id="loginPassword" class="form-control mb-2" value="password">
+                        <button class="btn btn-outline-primary w-100 mb-3" onclick="login()">Login</button>
+
+                        <hr>
+                        <h6>Social Login</h6>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-danger" onclick="socialLogin('google')">
+                                <svg width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 16 16">
+                                    <path
+                                        d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z" />
+                                </svg>
+                                Google
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="socialLogin('facebook')">
+                                <svg width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 16 16">
+                                    <path
+                                        d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z" />
+                                </svg>
+                                Facebook
+                            </button>
+                            <button class="btn btn-outline-dark" onclick="socialLogin('apple')">
+                                <svg width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 16 16">
+                                    <path
+                                        d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516.024.034 1.52.087 2.475-1.258.955-1.345.762-2.391.728-2.43zm3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422.212-2.189 1.675-2.789 1.698-2.854.023-.065-.597-.79-1.254-1.157a3.692 3.692 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56.244.729.625 1.924 1.273 2.796.576.984 1.34 1.667 1.659 1.899.319.232 1.219.386 1.843.067.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758.347-.79.505-1.217.473-1.282z" />
+                                </svg>
+                                Apple
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">💳 Stripe Testing</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="mb-3">Test Cards</h6>
+                        <div class="small mb-3">
+                            <div class="mb-2">
+                                <strong>Success:</strong> 4242 4242 4242 4242
+                                <button class="btn btn-sm btn-outline-secondary ms-2"
+                                    onclick="copyToClipboard('4242424242424242')">Copy</button>
+                            </div>
+                            <div class="mb-2">
+                                <strong>Declined:</strong> 4000 0000 0000 0002
+                                <button class="btn btn-sm btn-outline-secondary ms-2"
+                                    onclick="copyToClipboard('4000000000000002')">Copy</button>
+                            </div>
+                            <div class="mb-2">
+                                <strong>3D Secure:</strong> 4000 0027 6000 3184
+                                <button class="btn btn-sm btn-outline-secondary ms-2"
+                                    onclick="copyToClipboard('4000002760003184')">Copy</button>
+                            </div>
+                        </div>
+                        <hr>
+                        <h6>Quick Actions</h6>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-sm btn-outline-success" onclick="testStripePayment()">Test
+                                Payment</button>
+                            <button class="btn btn-sm btn-outline-info" onclick="testStripeSubscription()">Test
+                                Subscription</button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="testStripeRefund()">Test
+                                Refund</button>
+                        </div>
+                    </div>
+                </div> -->
+
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">Select Endpoint</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select id="categorySelect" class="form-select" onchange="loadEndpoints()">
+                                <option value="auth">Authentication</option>
+                                <option value="user">Users</option>
+                                <option value="plans">Subscriptions Plans</option>
+                                <option value="interactive">Interactive Sessions</option>
+                                <option value="feedback">Feedback</option>
+                                <option value="exhibits">Exhibits</option>
+                                <option value="floor_plans">Floor Plans</option>
+                                <option value="ar_anchors">AR Anchors</option>
+                                <option value="subscriptions">Subscriptions</option>
+                                <option value="payment">Payment Methods</option>
+                                <option value="stripe_test">🧪 Stripe Testing</option>
+                                <!-- <option value="mobile_ar">Mobile AR</option> -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Action</label>
+                            <select id="endpointSelect" class="form-select" onchange="updateRequestDetails()"></select>
+                        </div>
+                        <div class="alert alert-info small" id="endpointDescription">Select endpoint</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5 class="mb-0">Request</h5>
+                        <span id="requestMethodBadge" class="badge bg-secondary">METHOD</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">/api</span>
+                            <input type="text" id="requestUrl" class="form-control">
+                        </div>
+                        <div>
+                            <label class="form-label">Request Body (JSON)</label>
+                            <textarea id="requestBody" class="form-control font-monospace" rows="10"></textarea>
+                        </div>
+                        <div class="mt-3 text-end">
+                            <button class="btn btn-success btn-lg px-5" onclick="sendRequest()">Send Request</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" id="responseCard" style="display:none;">
+                    <div class="card-header">
+                        <h5 class="mb-0">Response <span id="responseStatus" class="badge bg-secondary ms-2"></span></h5>
+                    </div>
+                    <div class="card-body">
+                        <pre id="responseBody"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8000/api';
+
+        const endpoints = {
+            auth: [
+                { name: 'Register', method: 'POST', url: '/register', desc: 'Register new user', body: { "name": "User", "email": "user@test.com", "password": "password", "password_confirmation": "password", "phone": "1234567890", "country": "USA" } },
+                { name: 'Login', method: 'POST', url: '/login', desc: 'Login user', body: { "email": "user@test.com", "password": "password" } },
+                { name: 'Verify Email', method: 'POST', url: '/verify-email', desc: 'Verify email', body: { "email": "user@test.com", "code": "123456" } },
+                { name: 'Resend Verification Code', method: 'POST', url: '/resend-verification-code', desc: 'Resend code', body: { "email": "user@test.com" } },
+                { name: 'Forgot Password', method: 'POST', url: '/forgot-password', desc: 'Request reset', body: { "email": "user@test.com" } },
+                { name: 'Reset Password', method: 'POST', url: '/reset-password', desc: 'Reset password', body: { "email": "user@test.com", "code": "123456", "password": "newpass", "password_confirmation": "newpass" } },
+                { name: 'Update Profile', method: 'POST', url: '/profile/update', desc: 'Update profile', body: { "name": "Updated Name", "phone": "1234567890", "country": "USA", "city": "New York", "address": "123 Main St" } },
+                { name: 'Update Password', method: 'POST', url: '/password/update', desc: 'Change password', body: { "current_password": "password", "new_password": "newpass", "new_password_confirmation": "newpass" } },
+                { name: 'Logout', method: 'POST', url: '/logout', desc: 'Logout', body: null }
+            ],
+            user: [
+                { name: 'Dashboard', method: 'GET', url: '/dashboard', desc: 'Get dashboard', body: null },
+                { name: 'List Users', method: 'GET', url: '/users', desc: 'List all', body: null },
+                { name: 'Get User', method: 'GET', url: '/users/1', desc: 'Get by ID', body: null },
+                { name: 'Create User', method: 'POST', url: '/users', desc: 'Create', body: { "name": "Test", "username": "test", "email": "test@test.com", "password": "password", "role": "user or admin", "status": "active" } },//user can be admin or user
+                { name: 'Update User', method: 'PUT', url: '/users/1', desc: 'Update', body: { "name": "Updated", "username": "admin", "email": "admin@example.com", "phone": "1312124", "role": "user", "status": "active" } },
+                { name: 'Delete User', method: 'DELETE', url: '/users/1', desc: 'Delete', body: null }
+            ],
+            subscriptions: [
+                { name: 'Initiate', method: 'POST', url: '/subscriptions/initiate', desc: 'Start new subscription', body: { "plan_id": 1, "payment_method_id": 1 } },
+                { name: 'Verify', method: 'POST', url: '/subscriptions/verify', desc: 'Verify subscription payment', body: { "subscription_id": 1, "transaction_id": "tx_123" } }
+            ],
+            exhibits: [
+                { name: 'List Exhibits', method: 'GET', url: '/exhibits', desc: 'List all', body: null },
+                { name: 'Get Exhibit', method: 'GET', url: '/exhibits/1', desc: 'Get by ID', body: null },
+                { name: 'Create Exhibit', method: 'POST', url: '/exhibits', desc: 'Create', body: { "title": "Art Show", "artist_name": "Artist", "category": "Modern", "location": "Hall A", "status": "ongoing", "description": "Desc", "start_date": "2025-01-01", "end_date": "2025-12-31" , "is_promoted": false,} },
+                { name: 'Update Exhibit', method: 'PUT', url: '/exhibits/1', desc: 'Update', body: { "title": "Updated", "artist_name": "Artist", "artist_bio": "Bio", "category": "Modern", "location": "Hall A", "status": "ongoing", "description": "Desc" ,"is_promoted": false,} },
+                { name: 'Delete Exhibit', method: 'DELETE', url: '/exhibits/1', desc: 'Delete', body: null },
+                { name: 'Toggle Favorite', method: 'POST', url: '/exhibits/1/favorite', desc: 'Toggle favorite', body: null },
+                { name: 'Mark Visited', method: 'POST', url: '/exhibits/1/visited', desc: 'Mark visited', body: null },
+                { name: 'Get Favorites', method: 'GET', url: '/exhibits/favorites', desc: 'Favorites', body: null },
+                { name: 'Get Visited', method: 'GET', url: '/exhibits/visited', desc: 'Visited', body: null }
+            ],
+            plans: [
+                { name: 'List Plans', method: 'GET', url: '/plans', desc: 'List all', body: null },
+                { name: 'Get Plan', method: 'GET', url: '/plans/1', desc: 'Get by ID', body: null },
+                { name: 'Create Plan', method: 'POST', url: '/plans', desc: 'Create', body: { "name": "Premium", "total_fee": 99.99, "daily_fee": 5.00, "features": ["Access", "Priority"], "status": "active" } },
+                { name: 'Update Plan', method: 'PUT', url: '/plans/1', desc: 'Update', body: { "name": "Premium", "total_fee": 99.99, "daily_fee": 5.00, "features": ["Access", "Priority"], "status": "active" } },
+                { name: 'Delete Plan', method: 'DELETE', url: '/plans/1', desc: 'Delete', body: null }
+            ],
+            interactive: [
+                { name: 'List Sessions', method: 'GET', url: '/interactive-sessions', desc: 'List all', body: null },
+                { name: 'Get Session', method: 'GET', url: '/interactive-sessions/1', desc: 'Get by ID', body: null },
+                { name: 'Create Session', method: 'POST', url: '/interactive-sessions', desc: 'Create', body: { "name": "Workshop", "date": "2025-06-15", "time": "14:00", "location": "Studio", "type": "Workshop", "hosted_by": "Host", "description": "Desc", "role": "admin" } },
+                { name: 'Delete', method: 'DELETE', url: '/interactive-sessions/1', desc: 'Delete', body: null }
+            ],
+            payment: [
+                { name: 'List Methods', method: 'GET', url: '/payment-methods', desc: 'List all payment methods', body: null },
+                { name: 'Get Method', method: 'GET', url: '/payment-methods/1', desc: 'Get payment method by ID', body: null },
+                { name: 'Add Method', method: 'POST', url: '/payment-methods', desc: 'Add new payment method', body: { "type": "stripe", "provider": "stripe", "last_four": "4242", "expiry_date": "12/25", "is_default": true, "provider_id": "pm_test_123" } },
+                { name: 'Set Default', method: 'POST', url: '/payment-methods/1/set-default', desc: 'Set as default payment method', body: null },
+                { name: 'Delete Method', method: 'DELETE', url: '/payment-methods/1', desc: 'Delete payment method', body: null }
+            ],
+            feedback: [
+                { name: 'List Feedback', method: 'GET', url: '/feedback', desc: 'List all', body: null },
+                { name: 'Get Feedback', method: 'GET', url: '/feedback/1', desc: 'Get by ID', body: null },
+                { name: 'Submit', method: 'POST', url: '/feedback', desc: 'Submit', body: { "issue_type": "bug", "description": "Issue" } },
+                { name: 'Update', method: 'PUT', url: '/feedback/1', desc: 'Update', body: { "issue_type": "bug", "description": "Updated" } },
+                { name: 'Delete', method: 'DELETE', url: '/feedback/1', desc: 'Delete', body: null }
+            ],
+            ar_anchors: [
+                { name: 'List Anchors', method: 'GET', url: '/ar-anchors', desc: 'List all', body: null },
+                { name: 'Get Anchor', method: 'GET', url: '/ar-anchors/1', desc: 'Get by ID', body: null },
+                { name: 'Create', method: 'POST', url: '/ar-anchors', desc: 'Create', body: { "floor_plan_id": 1, "anchor_name": "Entrance", "anchor_type": "reference_point", "position_x": 0.0, "position_y": 1.5, "position_z": 0.0, "rotation_w": 1.0, "is_active": true } },
+                { name: 'Update', method: 'PUT', url: '/ar-anchors/1', desc: 'Update', body: { "anchor_name": "Updated" } },
+                { name: 'Delete', method: 'DELETE', url: '/ar-anchors/1', desc: 'Delete', body: null },
+
+            ],
+            floor_plans: [
+                { name: 'List Floor Plans', method: 'GET', url: '/floor-plans', desc: 'List all', body: null },
+                { name: 'Get Floor Plan', method: 'GET', url: '/floor-plans/1', desc: 'Get by ID', body: null },
+                { name: 'Create', method: 'POST', url: '/floor-plans', desc: 'Create', body: { "exhibit_id": 1, "name": "Ground Floor", "description": "Hall", "width": 50.0, "height": 5.5, "length": 30.0, "floor_level": 0, "is_active": true } },
+                { name: 'Update', method: 'PUT', url: '/floor-plans/1', desc: 'Update', body: { "name": "Updated" } },
+                { name: 'Delete', method: 'DELETE', url: '/floor-plans/1', desc: 'Delete', body: null }
+            ],
+            stripe_test: [
+                { name: 'Get Test Cards', method: 'GET', url: '/stripe-test/test-cards', desc: 'Get list of Stripe test card numbers', body: null },
+                { name: 'Get Account Info', method: 'GET', url: '/stripe-test/account-info', desc: 'Get Stripe account information', body: null },
+                { name: 'Create Test Payment Method', method: 'POST', url: '/stripe-test/create-payment-method', desc: 'Create test payment method with Stripe', body: { "card_number": "4242424242424242", "exp_month": 12, "exp_year": 2025, "cvc": "123", "is_default": true } },
+                { name: 'Test Payment (Success)', method: 'POST', url: '/stripe-test/test-payment', desc: 'Test a successful payment', body: { "payment_method_id": 1, "amount": 10.00, "description": "Test Payment" } },
+                { name: 'Test Payment (Decline)', method: 'POST', url: '/stripe-test/create-payment-method', desc: 'Create payment method that will decline', body: { "card_number": "4000000000000002", "exp_month": 12, "exp_year": 2025, "cvc": "123", "is_default": false } }
+            ],
+        };
+
+        function init() {
+            loadEndpoints();
+            const savedToken = localStorage.getItem('api_tester_token');
+            if (savedToken) document.getElementById('authToken').value = savedToken;
+        }
+
+        function loadEndpoints() {
+            const category = document.getElementById('categorySelect').value;
+            const select = document.getElementById('endpointSelect');
+            select.innerHTML = '';
+            endpoints[category].forEach((ep, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.text = ep.name;
+                select.appendChild(option);
+            });
+            updateRequestDetails();
+        }
+
+        function updateRequestDetails() {
+            const category = document.getElementById('categorySelect').value;
+            const index = document.getElementById('endpointSelect').value;
+            const ep = endpoints[category][index];
+
+            document.getElementById('requestMethodBadge').textContent = ep.method;
+            document.getElementById('requestMethodBadge').className = `badge bg-${getMethodColor(ep.method)}`;
+            document.getElementById('requestUrl').value = ep.url;
+            document.getElementById('endpointDescription').textContent = ep.desc;
+
+            if (ep.method === 'GET' || ep.method === 'DELETE') {
+                document.getElementById('requestBody').value = '';
+                document.getElementById('requestBody').disabled = true;
+            } else {
+                document.getElementById('requestBody').disabled = false;
+                document.getElementById('requestBody').value = ep.body ? JSON.stringify(ep.body, null, 2) : '';
+            }
+        }
+
+        function getMethodColor(method) {
+            const colors = { 'GET': 'primary', 'POST': 'success', 'PUT': 'warning', 'DELETE': 'danger' };
+            return colors[method] || 'secondary';
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch(API_BASE_URL + '/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.token) {
+                    document.getElementById('authToken').value = data.token;
+                    localStorage.setItem('api_tester_token', data.token);
+                    alert('Login successful!');
+                } else {
+                    alert('Login failed: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        function socialLogin(provider) {
+            const url = `http://localhost:8000/api/auth/${provider}`;
+            window.open(url, 'Social Login', 'width=600,height=700');
+            alert(`Social login initiated for ${provider}. Check the popup window and copy the token from the response.`);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(err => {
+                alert('Failed to copy: ' + err);
+            });
+        }
+
+        function testStripePayment() {
+            alert('This would initiate a test Stripe payment. Implement your Stripe payment flow here.');
+            // Example: You could set the endpoint to a Stripe payment endpoint
+            document.getElementById('categorySelect').value = 'payment';
+            loadEndpoints();
+        }
+
+        function testStripeSubscription() {
+            alert('This would test a Stripe subscription. Use the Subscriptions category to test subscription flows.');
+            document.getElementById('categorySelect').value = 'subscriptions';
+            loadEndpoints();
+        }
+
+        function testStripeRefund() {
+            alert('This would test a Stripe refund. Implement your refund endpoint and add it to the payment category.');
+        }
+
+        async function sendRequest() {
+            const url = API_BASE_URL + document.getElementById('requestUrl').value;
+            const method = document.getElementById('requestMethodBadge').textContent;
+            const token = document.getElementById('authToken').value;
+            const bodyStr = document.getElementById('requestBody').value;
+
+            const headers = { 'Accept': 'application/json' };
+            if (token) headers['Authorization'] = 'Bearer ' + token;
+
+            const options = { method, headers };
+            if (method !== 'GET' && method !== 'DELETE' && bodyStr) {
+                headers['Content-Type'] = 'application/json';
+                options.body = bodyStr;
+            }
+
+            const responseCard = document.getElementById('responseCard');
+            responseCard.style.display = 'block';
+            document.getElementById('responseBody').textContent = 'Loading...';
+            document.getElementById('responseStatus').textContent = '...';
+
+            try {
+                const response = await fetch(url, options);
+                const status = response.status;
+
+                document.getElementById('responseStatus').textContent = status + ' ' + response.statusText;
+                document.getElementById('responseStatus').className = `badge bg-${status >= 200 && status < 300 ? 'success' : 'danger'} ms-2`;
+
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await response.json();
+                    document.getElementById('responseBody').textContent = JSON.stringify(data, null, 2);
+                } else {
+                    document.getElementById('responseBody').textContent = await response.text();
+                }
+            } catch (error) {
+                document.getElementById('responseStatus').textContent = 'Error';
+                document.getElementById('responseStatus').className = 'badge bg-danger ms-2';
+                document.getElementById('responseBody').textContent = 'Network Error: ' + error.message;
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

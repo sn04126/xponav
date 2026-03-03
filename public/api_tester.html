@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Indoor Location API Tester</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="mb-4 text-center">🧪 AR Indoor Location API Tester</h1>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Authentication</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Auth Token</label>
+                            <input type="text" id="authToken" class="form-control" placeholder="Token">
+                        </div>
+                        <hr>
+                        <h6>Quick Login</h6>
+                        <input type="email" id="loginEmail" class="form-control mb-2" value="admin@example.com">
+                        <input type="password" id="loginPassword" class="form-control mb-2" value="password">
+                        <button class="btn btn-outline-primary w-100" onclick="login()">Login</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">Select Endpoint</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select id="categorySelect" class="form-select" onchange="loadEndpoints()">
+                                <option value="auth">Authentication</option>
+                                <option value="user">Users</option>
+                                <option value="exhibits">Exhibits</option>
+                                <option value="plans">Plans</option>
+                                <option value="interactive">Interactive Sessions</option>
+                                <option value="payment">💳 Payment Methods</option>
+                                <option value="subscriptions">📋 Subscriptions</option>
+                                <option value="stripe_test">🧪 Stripe Testing</option>
+                                <option value="feedback">Feedback</option>
+                                <option value="floor_plans">Floor Plans</option>
+                                <option value="ar_anchors">AR Anchors</option>
+                                <!-- <option value="mobile_ar">Mobile AR</option> -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Action</label>
+                            <select id="endpointSelect" class="form-select" onchange="updateRequestDetails()"></select>
+                        </div>
+                        <div class="alert alert-info small" id="endpointDescription">Select endpoint</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5 class="mb-0">Request</h5>
+                        <span id="requestMethodBadge" class="badge bg-secondary">METHOD</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">/api</span>
+                            <input type="text" id="requestUrl" class="form-control">
+                        </div>
+                        <div>
+                            <label class="form-label">Request Body (JSON)</label>
+                            <textarea id="requestBody" class="form-control font-monospace" rows="10"></textarea>
+                        </div>
+                        <div class="mt-3 text-end">
+                            <button class="btn btn-success btn-lg px-5" onclick="sendRequest()">Send Request</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" id="responseCard" style="display:none;">
+                    <div class="card-header">
+                        <h5 class="mb-0">Response <span id="responseStatus" class="badge bg-secondary ms-2"></span></h5>
+                    </div>
+                    <div class="card-body">
+                        <pre id="responseBody"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const API_BASE_URL = 'http://localhost:8000/api';
+        const endpoints = {
+            auth: [
+                { name: 'Register', method: 'POST', url: '/register', desc: 'Register new user', body: { "name": "User", "username": "user", "email": "user@test.com", "password": "password", "password_confirmation": "password", "phone": "1234567890", "country": "USA" } },
+                { name: 'Login', method: 'POST', url: '/login', desc: 'Login user', body: { "email": "admin@example.com", "password": "password" } },
+                { name: 'Verify Email', method: 'POST', url: '/verify-email', desc: 'Verify email', body: { "email": "user@test.com", "code": "123456" } },
+                { name: 'Logout', method: 'POST', url: '/logout', desc: 'Logout', body: null }
+            ],
+            user: [
+                { name: 'Dashboard', method: 'GET', url: '/dashboard', desc: 'Get dashboard', body: null },
+                { name: 'List Users', method: 'GET', url: '/users', desc: 'List all', body: null },
+                { name: 'Get User', method: 'GET', url: '/users/1', desc: 'Get by ID', body: null },
+                { name: 'Create User', method: 'POST', url: '/users', desc: 'Create', body: { "name": "Test", "username": "test", "email": "test@test.com", "password": "password", "role": "user", "status": "active" } },
+                { name: 'Update User', method: 'PUT', url: '/users/1', desc: 'Update', body: { "name": "Updated" } },
+                { name: 'Delete User', method: 'DELETE', url: '/users/1', desc: 'Delete', body: null }
+            ],
+            exhibits: [
+                { name: 'List Exhibits', method: 'GET', url: '/exhibits', desc: 'List all', body: null },
+                { name: 'Get Exhibit', method: 'GET', url: '/exhibits/1', desc: 'Get by ID', body: null },
+                { name: 'Create Exhibit', method: 'POST', url: '/exhibits', desc: 'Create', body: { "title": "Art Show", "artist_name": "Artist", "category": "Modern", "location": "Hall A", "status": "ongoing", "description": "Desc", "start_date": "2025-01-01", "end_date": "2025-12-31" } },
+                { name: 'Update Exhibit', method: 'PUT', url: '/exhibits/1', desc: 'Update', body: { "title": "Updated" } },
+                { name: 'Delete Exhibit', method: 'DELETE', url: '/exhibits/1', desc: 'Delete', body: null }
+            ],
+            plans: [
+                { name: 'List Plans', method: 'GET', url: '/plans', desc: 'List all', body: null },
+                { name: 'Get Plan', method: 'GET', url: '/plans/1', desc: 'Get by ID', body: null },
+                { name: 'Create Plan', method: 'POST', url: '/plans', desc: 'Create', body: { "name": "Premium", "total_fee": 99.99, "daily_fee": 5.00, "features": ["Access", "Priority"], "status": "active" } },
+                { name: 'Update Plan', method: 'PUT', url: '/plans/1', desc: 'Update', body: { "name": "Updated" } },
+                { name: 'Delete Plan', method: 'DELETE', url: '/plans/1', desc: 'Delete', body: null }
+            ],
+            interactive: [
+                { name: 'List Sessions', method: 'GET', url: '/interactive-sessions', desc: 'List all', body: null },
+                { name: 'Get Session', method: 'GET', url: '/interactive-sessions/1', desc: 'Get by ID', body: null },
+                { name: 'Create Session', method: 'POST', url: '/interactive-sessions', desc: 'Create', body: { "name": "Workshop", "date": "2025-06-15", "time": "14:00", "location": "Studio", "type": "Workshop", "hosted_by": "Host", "description": "Desc" } },
+                { name: 'Update Session', method: 'PUT', url: '/interactive-sessions/1', desc: 'Update', body: { "name": "Updated" } },
+                { name: 'Delete Session', method: 'DELETE', url: '/interactive-sessions/1', desc: 'Delete', body: null }
+            ],
+            payment: [
+                { name: 'List Methods', method: 'GET', url: '/payment-methods', desc: 'List all payment methods', body: null },
+                { name: 'Get Method', method: 'GET', url: '/payment-methods/1', desc: 'Get payment method by ID', body: null },
+                { name: 'Add Method', method: 'POST', url: '/payment-methods', desc: 'Add new payment method', body: { "type": "stripe", "provider": "stripe", "last_four": "4242", "expiry_date": "12/25", "is_default": true, "provider_id": "pm_test_123" } },
+                { name: 'Set Default', method: 'POST', url: '/payment-methods/1/set-default', desc: 'Set as default payment method', body: null },
+                { name: 'Delete Method', method: 'DELETE', url: '/payment-methods/1', desc: 'Delete payment method', body: null }
+            ],
+            subscriptions: [
+                { name: 'Initiate', method: 'POST', url: '/subscriptions/initiate', desc: 'Start new subscription', body: { "plan_id": 1, "payment_method_id": 1 } },
+                { name: 'Verify', method: 'POST', url: '/subscriptions/verify', desc: 'Verify subscription payment', body: { "subscription_id": 1, "transaction_id": "tx_123" } }
+            ],
+            stripe_test: [
+                { name: 'Get Test Cards', method: 'GET', url: '/stripe-test/test-cards', desc: 'Get list of Stripe test card numbers', body: null },
+                { name: 'Get Account Info', method: 'GET', url: '/stripe-test/account-info', desc: 'Get Stripe account information', body: null },
+                { name: 'Create Test Payment Method', method: 'POST', url: '/stripe-test/create-payment-method', desc: 'Create test payment method with Stripe', body: { "card_number": "4242424242424242", "exp_month": 12, "exp_year": 2025, "cvc": "123", "is_default": true } },
+                { name: 'Test Payment (Success)', method: 'POST', url: '/stripe-test/test-payment', desc: 'Test a successful payment', body: { "payment_method_id": 1, "amount": 10.00, "description": "Test Payment" } },
+                { name: 'Test Payment (Decline)', method: 'POST', url: '/stripe-test/create-payment-method', desc: 'Create payment method that will decline', body: { "card_number": "4000000000000002", "exp_month": 12, "exp_year": 2025, "cvc": "123", "is_default": false } }
+            ],
+            feedback: [
+                { name: 'List Feedback', method: 'GET', url: '/feedback', desc: 'List all', body: null },
+                { name: 'Get Feedback', method: 'GET', url: '/feedback/1', desc: 'Get by ID', body: null },
+                { name: 'Submit', method: 'POST', url: '/feedback', desc: 'Submit', body: { "issue_type": "bug", "description": "Issue" } },
+                { name: 'Update', method: 'PUT', url: '/feedback/1', desc: 'Update', body: { "description": "Updated" } },
+                { name: 'Delete', method: 'DELETE', url: '/feedback/1', desc: 'Delete', body: null }
+            ],
+            floor_plans: [
+                { name: 'List Floor Plans', method: 'GET', url: '/floor-plans', desc: 'List all', body: null },
+                { name: 'Get Floor Plan', method: 'GET', url: '/floor-plans/1', desc: 'Get by ID', body: null },
+                { name: 'Create', method: 'POST', url: '/floor-plans', desc: 'Create', body: { "exhibit_id": 1, "name": "Ground Floor", "description": "Hall", "width": 50.0, "height": 5.5, "length": 30.0, "floor_level": 0, "is_active": true } },
+                { name: 'Update', method: 'PUT', url: '/floor-plans/1', desc: 'Update', body: { "name": "Updated" } },
+                { name: 'Delete', method: 'DELETE', url: '/floor-plans/1', desc: 'Delete', body: null }
+            ],
+            ar_anchors: [
+                { name: 'List Anchors', method: 'GET', url: '/ar-anchors', desc: 'List all', body: null },
+                { name: 'Get Anchor', method: 'GET', url: '/ar-anchors/1', desc: 'Get by ID', body: null },
+                { name: 'Create', method: 'POST', url: '/ar-anchors', desc: 'Create', body: { "floor_plan_id": 1, "anchor_name": "Entrance", "anchor_type": "reference_point", "position_x": 0.0, "position_y": 1.5, "position_z": 0.0, "rotation_w": 1.0, "is_active": true } },
+                { name: 'Update', method: 'PUT', url: '/ar-anchors/1', desc: 'Update', body: { "anchor_name": "Updated" } },
+                { name: 'Delete', method: 'DELETE', url: '/ar-anchors/1', desc: 'Delete', body: null }
+            ],
+            // mobile_ar: [
+            //     { name: 'Get Floor Plans', method: 'GET', url: '/ar/exhibits/1/floor-plans', desc: 'Get floor plans', body: null },
+            //     { name: 'Get AR Data', method: 'GET', url: '/ar/floor-plans/1/ar-data', desc: 'Get AR config', body: null },
+            //     { name: 'Get Anchors', method: 'GET', url: '/ar/floor-plans/1/anchors', desc: 'Get anchors', body: null },
+            //     { name: 'Calculate Position', method: 'POST', url: '/ar/calculate-position', desc: 'Calculate position', body: { "floor_plan_id": 1, "detected_anchors": [{ "anchor_id": 1, "distance": 2.5 }] } }
+            // ]
+        };
+
+        function init() {
+            loadEndpoints();
+            const savedToken = localStorage.getItem('api_tester_token');
+            if (savedToken) document.getElementById('authToken').value = savedToken;
+        }
+
+        function loadEndpoints() {
+            const category = document.getElementById('categorySelect').value;
+            const select = document.getElementById('endpointSelect');
+            select.innerHTML = '';
+            endpoints[category].forEach((ep, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.text = ep.name;
+                select.appendChild(option);
+            });
+            updateRequestDetails();
+        }
+
+        function updateRequestDetails() {
+            const category = document.getElementById('categorySelect').value;
+            const index = document.getElementById('endpointSelect').value;
+            const ep = endpoints[category][index];
+            document.getElementById('requestMethodBadge').textContent = ep.method;
+            document.getElementById('requestMethodBadge').className = `badge bg-${getMethodColor(ep.method)}`;
+            document.getElementById('requestUrl').value = ep.url;
+            document.getElementById('endpointDescription').textContent = ep.desc;
+            if (ep.method === 'GET' || ep.method === 'DELETE') {
+                document.getElementById('requestBody').value = '';
+                document.getElementById('requestBody').disabled = true;
+            } else {
+                document.getElementById('requestBody').disabled = false;
+                document.getElementById('requestBody').value = ep.body ? JSON.stringify(ep.body, null, 2) : '';
+            }
+        }
+
+        function getMethodColor(method) {
+            const colors = { 'GET': 'primary', 'POST': 'success', 'PUT': 'warning', 'DELETE': 'danger' };
+            return colors[method] || 'secondary';
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            try {
+                const response = await fetch(API_BASE_URL + '/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+                if (response.ok && data.token) {
+                    document.getElementById('authToken').value = data.token;
+                    localStorage.setItem('api_tester_token', data.token);
+                    alert('✅ Login successful!');
+                } else {
+                    alert('❌ Login failed: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        async function sendRequest() {
+            const url = API_BASE_URL + document.getElementById('requestUrl').value;
+            const method = document.getElementById('requestMethodBadge').textContent;
+            const token = document.getElementById('authToken').value;
+            const bodyStr = document.getElementById('requestBody').value;
+            const headers = { 'Accept': 'application/json' };
+            if (token) headers['Authorization'] = 'Bearer ' + token;
+            const options = { method, headers };
+            if (method !== 'GET' && method !== 'DELETE' && bodyStr) {
+                headers['Content-Type'] = 'application/json';
+                options.body = bodyStr;
+            }
+            const responseCard = document.getElementById('responseCard');
+            responseCard.style.display = 'block';
+            document.getElementById('responseBody').textContent = 'Loading...';
+            document.getElementById('responseStatus').textContent = '...';
+            try {
+                const response = await fetch(url, options);
+                const status = response.status;
+                document.getElementById('responseStatus').textContent = status + ' ' + response.statusText;
+                document.getElementById('responseStatus').className = `badge bg-${status >= 200 && status < 300 ? 'success' : 'danger'} ms-2`;
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await response.json();
+                    document.getElementById('responseBody').textContent = JSON.stringify(data, null, 2);
+                } else {
+                    document.getElementById('responseBody').textContent = await response.text();
+                }
+            } catch (error) {
+                document.getElementById('responseStatus').textContent = 'Error';
+                document.getElementById('responseStatus').className = 'badge bg-danger ms-2';
+                document.getElementById('responseBody').textContent = 'Network Error: ' + error.message;
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
