@@ -19,13 +19,13 @@
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
             <div>
-                <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">Total Fee (Rs.) *</label>
+                <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">Total Fee ($) *</label>
                 <input type="number" name="total_fee" value="{{ old('total_fee') }}" required step="0.01" min="0"
                        style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
                 @error('total_fee') <span style="color: #dc3545; font-size: 12px;">{{ $message }}</span> @enderror
             </div>
             <div>
-                <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">Daily Fee (Rs.) *</label>
+                <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">Daily Fee ($) *</label>
                 <input type="number" name="daily_fee" value="{{ old('daily_fee') }}" required step="0.01" min="0"
                        style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
                 @error('daily_fee') <span style="color: #dc3545; font-size: 12px;">{{ $message }}</span> @enderror

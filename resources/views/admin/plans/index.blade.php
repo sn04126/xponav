@@ -19,8 +19,8 @@
     <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden;">
         <div style="background: {{ $plan->status === 'active' ? '#1D5C3C' : '#6b7280' }}; color: white; padding: 20px; text-align: center;">
             <h3 style="font-size: 24px; margin-bottom: 5px;">{{ $plan->name }}</h3>
-            <div style="font-size: 36px; font-weight: 700;">Rs.{{ number_format($plan->total_fee) }}</div>
-            <div style="font-size: 13px; opacity: 0.8;">Rs.{{ number_format($plan->daily_fee, 2) }}/day</div>
+            <div style="font-size: 36px; font-weight: 700;">${{ number_format($plan->total_fee) }}</div>
+            <div style="font-size: 13px; opacity: 0.8;">${{ number_format($plan->daily_fee, 2) }}/day</div>
         </div>
         <div style="padding: 20px;">
             @if($plan->features)
