@@ -11,7 +11,7 @@ use App\Http\Controllers\Admin\QRCodeController;
 use App\Http\Controllers\Admin\HeatMapController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/admin/login');
 });
 
 // Social Authentication Routes (web routes for OAuth redirects)
