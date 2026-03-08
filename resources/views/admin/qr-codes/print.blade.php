@@ -167,8 +167,7 @@
 
         <div class="qr-body">
             <div class="qr-image">
-                <!-- Using Google Charts API for QR code generation -->
-                <img src="https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl={{ urlencode($scanUrl) }}&choe=UTF-8"
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={{ urlencode($qrCode->code) }}"
                      alt="QR Code for {{ $qrCode->name }}">
             </div>
 

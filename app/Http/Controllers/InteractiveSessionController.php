@@ -157,6 +157,11 @@ class InteractiveSessionController extends Controller
             $this->syncToPublic($path);
         }
 
+        // Keep existing type if not provided
+        if (!$request->filled('type')) {
+            $validated['type'] = $session->type ?? 'general';
+        }
+
         $session->update($validated);
 
         // Check if this is an API request or web request

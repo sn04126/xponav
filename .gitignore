@@ -17,6 +17,8 @@ public_html/hot
 
 storage/*.key
 .env
+.env.backup
+.env.production
 Homestead.yaml
 Homestead.json
 /.vagrant
@@ -24,7 +26,15 @@ Homestead.json
 
 /public/build
 /storage/pail
-.env.backup
-.env.production
 .phpactor.json
 auth.json
+
+# Local development / testing files
+ngrok.exe
+nul
+*.bat
+cacert.pem
+
+# IDE
+.idea/
+.vscode/

@@ -14,6 +14,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Social Authentication Routes (web routes for OAuth redirects)
+// Unity opens system browser → these routes handle OAuth flow → redirect back to Unity via deep link
+Route::get('/auth/{provider}', [\App\Http\Controllers\SocialAuthController::class, 'redirectToProvider'])
+    ->name('social.redirect');
+Route::get('/auth/{provider}/callback', [\App\Http\Controllers\SocialAuthController::class, 'handleProviderCallback'])
+    ->name('social.callback');
+
 // Admin Login Routes
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', [AdminDashboardController::class, 'showLogin'])->name('login');
@@ -50,6 +57,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:web', 'admin'])->group
     // AJAX endpoints for QR code form
     Route::get('ajax/exhibits/{exhibit}/floor-plans', [QRCodeController::class, 'getFloorPlans'])->name('ajax.floor-plans');
     Route::get('ajax/floor-plans/{floorPlan}/anchors', [QRCodeController::class, 'getAnchors'])->name('ajax.anchors');
+
+    // Plans Management
+    Route::resource('plans', \App\Http\Controllers\Admin\PlanController::class);
+
+    // Subscription Management
+    Route::get('subscriptions', [\App\Http\Controllers\Admin\SubscriptionManagementController::class, 'index'])->name('subscriptions.index');
+
+    // Navigation Analytics
+    Route::get('navigation', [\App\Http\Controllers\Admin\NavigationAnalyticsController::class, 'index'])->name('navigation.index');
 
     // Heat Maps Analytics
     Route::get('heat-maps', [HeatMapController::class, 'index'])->name('heat-maps.index');

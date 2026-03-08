@@ -37,6 +37,8 @@ class User extends Authenticatable
         'provider_id',
         'provider_token',
         'avatar',
+        'membership_tier',
+        'membership_expiry',
     ];
 
     /**

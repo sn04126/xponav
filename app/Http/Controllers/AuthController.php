@@ -152,6 +152,16 @@ class AuthController extends Controller
 
     public function forgotPassword(Request $request)
     {
+        // Rate limit: 5 attempts per minute per IP
+        $key = 'forgot-password:' . $request->ip();
+        if (\Illuminate\Support\Facades\Cache::has($key) && \Illuminate\Support\Facades\Cache::get($key) >= 5) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Too many password reset attempts. Please try again later.'
+            ], 429);
+        }
+        \Illuminate\Support\Facades\Cache::put($key, (\Illuminate\Support\Facades\Cache::get($key, 0)) + 1, 60);
+
         $request->validate([
             'email' => 'required|email|exists:users,email',
         ]);

@@ -160,7 +160,7 @@
                 </div>
                 <div class="qr-body">
                     <div class="qr-image">
-                        <img src="https://chart.googleapis.com/chart?chs=180x180&cht=qr&chl={{ urlencode($baseUrl . $qrCode->code) }}&choe=UTF-8"
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ urlencode($qrCode->code) }}"
                              alt="QR Code">
                     </div>
                     <div class="location-name">{{ $qrCode->name }}</div>

@@ -23,9 +23,9 @@ Route::post('/resend-verification-code', [AuthController::class, 'resendVerifica
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
-// Social Authentication
-Route::get('/auth/{provider}', [SocialAuthController::class, 'redirectToProvider']);
-Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback']);
+// Social Authentication is handled via WEB routes (not API) — see routes/web.php
+// OAuth requires session/cookie support for the redirect flow.
+// Unity opens: {APP_URL}/auth/{provider} → OAuth → callback → deep link back to Unity
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
@@ -61,8 +61,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('payment-methods', PaymentMethodController::class)->except(['update']);
 
     // Subscriptions
+    Route::get('/subscriptions/plans', [SubscriptionController::class, 'getPlans']);
+    Route::get('/subscriptions/status', [SubscriptionController::class, 'getStatus']);
     Route::post('/subscriptions/initiate', [SubscriptionController::class, 'initiate']);
     Route::post('/subscriptions/verify', [SubscriptionController::class, 'verify']);
+    Route::post('/subscriptions/cancel', [SubscriptionController::class, 'cancel']);
 
 
     // Floor Plans (Admin CRUD)
@@ -146,4 +149,19 @@ Route::middleware('auth:sanctum')->prefix('qr-codes')->group(function () {
     // Statistics
     Route::get('/statistics/{exhibit}', [QRCodeController::class, 'statistics']);
 });
+
+// Stripe Webhook (no auth - verified by Stripe signature)
+Route::post('/stripe/webhook', [\App\Http\Controllers\Api\StripeWebhookController::class, 'handle']);
+
+// Navigation Sessions (authenticated)
+Route::middleware('auth:sanctum')->prefix('navigation-sessions')->group(function () {
+    Route::post('/', [\App\Http\Controllers\Api\NavigationSessionController::class, 'store']);
+    Route::put('/{session}', [\App\Http\Controllers\Api\NavigationSessionController::class, 'update']);
+    Route::post('/event', [\App\Http\Controllers\Api\NavigationSessionController::class, 'logEvent']);
+    Route::get('/', [\App\Http\Controllers\Api\NavigationSessionController::class, 'index']);
+    Route::get('/stats', [\App\Http\Controllers\Api\NavigationSessionController::class, 'stats']);
+});
+
+// Navigation Targets (public - for Unity app)
+Route::get('/exhibits/{exhibitId}/navigation-targets', [\App\Http\Controllers\Api\NavigationTargetController::class, 'byExhibit']);
 

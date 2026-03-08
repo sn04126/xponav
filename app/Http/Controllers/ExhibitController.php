@@ -219,6 +219,11 @@ class ExhibitController extends Controller
         $validated['is_active'] = $request->has('is_active') ? true : false;
         $validated['is_promoted'] = $request->has('is_promoted') ? true : false;
 
+        // Keep existing status if not provided
+        if (!$request->filled('status')) {
+            $validated['status'] = $exhibit->status ?? 'ongoing';
+        }
+
         $exhibit->update($validated);
 
         // Check if this is an API request or web request
