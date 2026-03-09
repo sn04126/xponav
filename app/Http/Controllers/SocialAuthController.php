@@ -206,6 +206,174 @@ class SocialAuthController extends Controller
         return $user;
     }
 
+    // =========================================================================
+    // NATIVE SDK ENDPOINT
+    // Called by Unity after Google / Facebook native SDK sign-in.
+    // POST /api/auth/social-token
+    // Body: { "provider": "google"|"facebook", "token": "..." }
+    // =========================================================================
+
+    /**
+     * Verify a native-SDK token and return a Sanctum token.
+     */
+    public function handleNativeToken(Request $request)
+    {
+        $request->validate([
+            'provider' => 'required|string|in:google,facebook',
+            'token'    => 'required|string',
+        ]);
+
+        try {
+            $providerData = match ($request->provider) {
+                'google'   => $this->verifyGoogleIdToken($request->token),
+                'facebook' => $this->verifyFacebookAccessToken($request->token),
+            };
+
+            $user  = $this->findOrCreateNativeUser($providerData, $request->provider);
+            $token = $user->createToken('native_auth')->plainTextToken;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Login successful',
+                'token'   => $token,
+                'user'    => [
+                    'id'                => $user->id,
+                    'name'              => $user->name,
+                    'email'             => $user->email,
+                    'role'              => $user->role,
+                    'avatar'            => $user->avatar,
+                    'membership_tier'   => $user->membership_tier,
+                    'membership_expiry' => $user->membership_expiry,
+                ],
+            ]);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Native social auth error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 401);
+        }
+    }
+
+    /**
+     * Verify a Google ID Token via Google's tokeninfo endpoint.
+     * Returns normalized user array.
+     */
+    private function verifyGoogleIdToken(string $idToken): array
+    {
+        $response = \Illuminate\Support\Facades\Http::get(
+            'https://oauth2.googleapis.com/tokeninfo',
+            ['id_token' => $idToken]
+        );
+
+        if (! $response->successful() || isset($response['error'])) {
+            throw new \Exception('Invalid Google token');
+        }
+
+        $data = $response->json();
+
+        // Verify the token was issued for our Web Client ID
+        $allowedAudiences = [
+            config('services.google.client_id'),
+        ];
+
+        if (! in_array($data['aud'] ?? '', $allowedAudiences)) {
+            throw new \Exception('Google token audience mismatch');
+        }
+
+        return [
+            'provider_id' => $data['sub'],
+            'email'       => $data['email'] ?? null,
+            'name'        => $data['name'] ?? ($data['given_name'] ?? 'Google User'),
+            'avatar'      => $data['picture'] ?? null,
+        ];
+    }
+
+    /**
+     * Verify a Facebook Access Token via Graph API.
+     * Returns normalized user array.
+     */
+    private function verifyFacebookAccessToken(string $accessToken): array
+    {
+        $response = \Illuminate\Support\Facades\Http::get(
+            'https://graph.facebook.com/me',
+            [
+                'access_token' => $accessToken,
+                'fields'       => 'id,name,email,picture.type(large)',
+            ]
+        );
+
+        if (! $response->successful() || isset($response['error'])) {
+            throw new \Exception('Invalid Facebook token');
+        }
+
+        $data = $response->json();
+
+        if (empty($data['id'])) {
+            throw new \Exception('Could not retrieve Facebook user data');
+        }
+
+        return [
+            'provider_id' => $data['id'],
+            'email'       => $data['email'] ?? null,
+            'name'        => $data['name'] ?? 'Facebook User',
+            'avatar'      => $data['picture']['data']['url'] ?? null,
+        ];
+    }
+
+    /**
+     * Find or create a User from native SDK verified data.
+     */
+    private function findOrCreateNativeUser(array $providerData, string $provider): \App\Models\User
+    {
+        // 1. Look up by provider + provider_id
+        $user = \App\Models\User::where('provider', $provider)
+            ->where('provider_id', $providerData['provider_id'])
+            ->first();
+
+        if (! $user && ! empty($providerData['email'])) {
+            // 2. Look up by email (link existing account)
+            $user = \App\Models\User::where('email', $providerData['email'])->first();
+
+            if ($user) {
+                $user->update([
+                    'provider'    => $provider,
+                    'provider_id' => $providerData['provider_id'],
+                    'avatar'      => $providerData['avatar'] ?? $user->avatar,
+                ]);
+            }
+        }
+
+        if (! $user) {
+            // 3. Create brand-new user
+            $email = $providerData['email']
+                ?? ($provider . '_' . $providerData['provider_id'] . '@noemail.xponav');
+
+            $user = \App\Models\User::create([
+                'name'              => $providerData['name'],
+                'email'             => $email,
+                'username'          => explode('@', $email)[0] . rand(100, 999),
+                'provider'          => $provider,
+                'provider_id'       => $providerData['provider_id'],
+                'avatar'            => $providerData['avatar'] ?? null,
+                'email_verified_at' => now(),
+                'role'              => 'user',
+                'status'            => 'active',
+                'password'          => \Illuminate\Support\Facades\Hash::make(
+                    \Illuminate\Support\Str::random(32)
+                ),
+            ]);
+        } else {
+            // Always refresh the avatar
+            if (! empty($providerData['avatar'])) {
+                $user->update(['avatar' => $providerData['avatar']]);
+            }
+        }
+
+        return $user;
+    }
+
     /**
      * Show error page with option to retry or return to app
      */

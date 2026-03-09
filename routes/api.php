@@ -27,6 +27,10 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 // OAuth requires session/cookie support for the redirect flow.
 // Unity opens: {APP_URL}/auth/{provider} → OAuth → callback → deep link back to Unity
 
+// Native SDK social auth — Unity sends the Google idToken / Facebook accessToken directly
+// POST /api/auth/social-token  →  { provider: "google"|"facebook", token: "..." }
+Route::post('/auth/social-token', [SocialAuthController::class, 'handleNativeToken']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::post('/profile/update', [AuthController::class, 'updateProfile']);
