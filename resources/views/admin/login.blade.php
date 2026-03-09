@@ -175,31 +175,6 @@
             font-size: 14px;
         }
 
-        .divider {
-            margin-top: 28px;
-            padding-top: 24px;
-            border-top: 1px solid #eee;
-            text-align: center;
-        }
-
-        .divider p {
-            font-size: 13px;
-            color: #888;
-            margin-bottom: 4px;
-        }
-
-        .divider .credentials {
-            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-            font-size: 13px;
-            color: #1D5C3C;
-            font-weight: 600;
-            background: #f0f7f4;
-            padding: 8px 16px;
-            border-radius: 6px;
-            display: inline-block;
-            margin-top: 6px;
-        }
-
         .login-footer {
             text-align: center;
             margin-top: 24px;
@@ -298,11 +273,6 @@
 
                 <button type="submit" class="btn-login">Sign In</button>
             </form>
-
-            <div class="divider">
-                <p>Demo Credentials</p>
-                <span class="credentials">admin@xponav.com / admin123</span>
-            </div>
         </div>
 
         <p class="login-footer">&copy; 2026 XpoNav. All rights reserved.</p>
