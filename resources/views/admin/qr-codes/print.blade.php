@@ -3,207 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code - {{ $qrCode->name }}</title>
+    <title>QR Poster – {{ $qrCode->name }}</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-            padding: 20px;
+            background: #f0f2f5;
+            padding: 24px;
+            color: #1a1a2e;
         }
 
+        /* ── Print Card ── */
         .qr-card {
-            width: 400px;
+            width: 420px;
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 6px 30px rgba(0,0,0,0.12);
             overflow: hidden;
             margin: 0 auto;
         }
 
         .qr-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
             color: white;
-            padding: 20px;
+            padding: 22px 20px 18px;
             text-align: center;
         }
-
+        .qr-header .app-name {
+            font-size: 13px; font-weight: 600; letter-spacing: 3px;
+            text-transform: uppercase; opacity: .7; margin-bottom: 6px;
+        }
         .qr-header h1 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 5px;
+            font-size: 22px; font-weight: 700; line-height: 1.2;
+        }
+        .qr-header .sub {
+            font-size: 12px; opacity: .75; margin-top: 4px;
         }
 
-        .qr-header p {
-            font-size: 12px;
-            opacity: 0.9;
-        }
-
-        .qr-body {
-            padding: 30px;
+        /* ── QR Image ── */
+        .qr-section {
+            padding: 28px 20px 10px;
             text-align: center;
         }
-
-        .qr-image {
-            width: 250px;
-            height: 250px;
-            margin: 0 auto 20px;
-            background: white;
+        .qr-image-wrap {
+            width: 240px; height: 240px;
+            border: 3px solid #0f3460;
+            border-radius: 14px;
             padding: 10px;
-            border: 2px solid #eee;
-            border-radius: 12px;
+            margin: 0 auto 18px;
+            background: white;
         }
+        .qr-image-wrap img { width: 100%; height: 100%; }
 
-        .qr-image img {
-            width: 100%;
-            height: 100%;
+        /* ── Manual Code (big, bold, scannable by eye) ── */
+        .manual-code-section {
+            padding: 0 20px 18px;
+            text-align: center;
         }
-
-        .location-name {
-            font-size: 24px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 10px;
+        .manual-code-label {
+            font-size: 11px; color: #888; text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 6px;
         }
-
-        .location-details {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        .qr-code-text {
-            font-family: 'Courier New', monospace;
-            font-size: 16px;
-            background: #f8f9fa;
-            padding: 10px 20px;
-            border-radius: 8px;
+        .manual-code {
             display: inline-block;
-            color: #333;
-            letter-spacing: 1px;
+            background: #1a1a2e;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            padding: 12px 24px;
+            border-radius: 10px;
+        }
+        .manual-code-hint {
+            font-size: 11px; color: #999; margin-top: 6px;
         }
 
+        /* ── Location Info ── */
+        .location-section {
+            padding: 0 20px 18px;
+            text-align: center;
+        }
+        .location-name {
+            font-size: 20px; font-weight: 700; color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+        .location-meta {
+            font-size: 13px; color: #666;
+        }
+
+        /* ── Instructions ── */
+        .instructions {
+            margin: 0 20px 18px;
+            padding: 14px 16px;
+            background: #e8f4fd;
+            border-radius: 10px;
+            border-left: 4px solid #0077b6;
+        }
+        .instructions h3 { font-size: 13px; color: #0077b6; margin-bottom: 8px; }
+        .instructions ol { font-size: 12px; color: #444; padding-left: 18px; line-height: 1.8; }
+
+        /* ── Footer ── */
         .qr-footer {
             background: #f8f9fa;
-            padding: 15px;
+            padding: 12px 20px;
             text-align: center;
             border-top: 1px solid #eee;
+            font-size: 11px; color: #aaa;
         }
 
-        .qr-footer p {
-            font-size: 12px;
-            color: #888;
+        /* ── Buttons (no-print) ── */
+        .action-bar {
+            width: 420px; margin: 18px auto 0;
+            display: flex; gap: 10px;
         }
-
-        .instructions {
-            margin-top: 20px;
-            padding: 15px;
-            background: #e8f4fd;
-            border-radius: 8px;
-            text-align: left;
+        .btn-print {
+            flex: 1; padding: 12px;
+            background: #0f3460; color: white;
+            border: none; border-radius: 10px;
+            font-size: 15px; cursor: pointer;
         }
-
-        .instructions h3 {
-            font-size: 14px;
-            color: #0077b6;
-            margin-bottom: 10px;
+        .btn-back {
+            flex: 1; padding: 12px;
+            background: #e9ecef; color: #333;
+            border: none; border-radius: 10px;
+            font-size: 15px; cursor: pointer; text-decoration: none;
+            display: flex; align-items: center; justify-content: center;
         }
-
-        .instructions ol {
-            font-size: 12px;
-            color: #555;
-            padding-left: 20px;
-        }
-
-        .instructions li {
-            margin-bottom: 5px;
-        }
+        .btn-print:hover { background:#16213e; }
+        .btn-back:hover  { background:#dee2e6; }
 
         @media print {
-            body {
-                background: white;
-                padding: 0;
-            }
-
-            .qr-card {
-                box-shadow: none;
-                border: 2px solid #ddd;
-            }
-
-            .no-print {
-                display: none !important;
-            }
-        }
-
-        .print-button {
-            display: block;
-            width: 400px;
-            margin: 20px auto;
-            padding: 12px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .print-button:hover {
-            background: #5a6fd6;
+            body { background: white; padding: 0; }
+            .qr-card { box-shadow: none; border: 1px solid #ccc; }
+            .no-print { display: none !important; }
         }
     </style>
 </head>
 <body>
-    <div class="qr-card">
-        <div class="qr-header">
-            <h1>{{ $qrCode->exhibit->name ?? 'XpoNav Exhibition' }}</h1>
-            <p>AR Navigation QR Code</p>
-        </div>
 
-        <div class="qr-body">
-            <div class="qr-image">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={{ urlencode($qrCode->code) }}"
-                     alt="QR Code for {{ $qrCode->name }}">
-            </div>
+<div class="qr-card">
+    <div class="qr-header">
+        <div class="app-name">XpoNav AR Navigation</div>
+        <h1>{{ $qrCode->name }}</h1>
+        <div class="sub">{{ $qrCode->exhibit->name ?? 'Exhibition Center' }}</div>
+    </div>
 
-            <div class="location-name">{{ $qrCode->name }}</div>
-
-            <div class="location-details">
-                {{ $qrCode->floorPlan->name ?? 'Floor' }} | Level {{ $qrCode->floorPlan->floor_level ?? '?' }}
-                @if($qrCode->description)
-                    <br>{{ $qrCode->description }}
-                @endif
-            </div>
-
-            <div class="qr-code-text">{{ $qrCode->code }}</div>
-
-            <div class="instructions">
-                <h3>How to Use</h3>
-                <ol>
-                    <li>Open the XpoNav app on your phone</li>
-                    <li>Tap "Scan QR Code" in the AR view</li>
-                    <li>Point your camera at this QR code</li>
-                    <li>Select your destination and follow the arrows!</li>
-                </ol>
-            </div>
-        </div>
-
-        <div class="qr-footer">
-            <p>Powered by XpoNav AR Navigation</p>
+    {{-- QR code image (generated by public API) --}}
+    <div class="qr-section">
+        <div class="qr-image-wrap">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&ecc=M&data={{ urlencode($qrCode->code) }}"
+                 alt="QR Code for {{ $qrCode->name }}"
+                 onerror="this.src='https://via.placeholder.com/240x240?text=QR+Error'">
         </div>
     </div>
 
-    <button class="print-button no-print" onclick="window.print()">
-        Print This QR Code
-    </button>
-
-    <div class="no-print" style="text-align: center; margin-top: 10px;">
-        <a href="{{ route('admin.qr-codes.index') }}" style="color: #667eea;">Back to QR Codes</a>
+    {{-- MANUAL CODE — large and readable --}}
+    <div class="manual-code-section">
+        <div class="manual-code-label">📱 Manual Code (type in app)</div>
+        <div class="manual-code">{{ $qrCode->code }}</div>
+        <div class="manual-code-hint">Tap "Enter Code" in the AR app and type this code</div>
     </div>
+
+    {{-- Location info --}}
+    <div class="location-section">
+        <div class="location-name">📍 {{ $qrCode->name }}</div>
+        <div class="location-meta">
+            {{ $qrCode->floorPlan->name ?? 'Main Floor' }}
+            &nbsp;·&nbsp; Level {{ $qrCode->floorPlan->floor_level ?? '1' }}
+            @if($qrCode->description)
+                <br>{{ $qrCode->description }}
+            @endif
+        </div>
+    </div>
+
+    {{-- Instructions --}}
+    <div class="instructions">
+        <h3>How to Use</h3>
+        <ol>
+            <li>Open the <strong>XpoNav</strong> app on your phone</li>
+            <li>Tap <strong>Start AR Navigation</strong></li>
+            <li><strong>Option A:</strong> tap "Scan QR" and point camera at the QR above</li>
+            <li><strong>Option B:</strong> tap "Enter Code" and type the code above</li>
+            <li>Select your destination and follow the arrows!</li>
+        </ol>
+    </div>
+
+    <div class="qr-footer">
+        xponav.com &nbsp;·&nbsp; AR Exhibition Navigation System
+    </div>
+</div>
+
+<div class="action-bar no-print">
+    <button class="btn-print" onclick="window.print()">🖨️ Print This Poster</button>
+    <a href="{{ route('admin.qr-codes.index') }}" class="btn-back">← Back to List</a>
+</div>
+
 </body>
 </html>

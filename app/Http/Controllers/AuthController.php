@@ -282,6 +282,20 @@ class AuthController extends Controller
     }
 
     /**
+     * Return the authenticated user's profile.
+     * GET /api/me
+     */
+    public function me(Request $request)
+    {
+        $user = $request->user()->fresh(); // reload from DB to get latest data
+
+        return response()->json([
+            'success' => true,
+            'user'    => $user,
+        ]);
+    }
+
+    /**
      * Log verification code to file for demo/testing purposes
      * File location: storage/logs/verification_codes.txt
      */

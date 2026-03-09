@@ -38,3 +38,4 @@ cacert.pem
 # IDE
 .idea/
 .vscode/
+database_export.sql

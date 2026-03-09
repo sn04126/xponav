@@ -32,6 +32,7 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::post('/auth/social-token', [SocialAuthController::class, 'handleNativeToken']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/me', [AuthController::class, 'me']);              // Get current user profile
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::post('/profile/update', [AuthController::class, 'updateProfile']);
     Route::post('/password/update', [AuthController::class, 'updatePassword']);
