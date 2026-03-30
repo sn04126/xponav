@@ -14,6 +14,10 @@ Route::get('/', function () {
     return redirect('/admin/login');
 });
 
+// Stripe Payment redirect pages (opened in device browser by Stripe)
+Route::get('/payment/success', [\App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
+Route::get('/payment/cancel',  [\App\Http\Controllers\PaymentController::class, 'cancel'])->name('payment.cancel');
+
 // Social Authentication Routes (web routes for OAuth redirects)
 // Unity opens system browser → these routes handle OAuth flow → redirect back to Unity via deep link
 Route::get('/auth/{provider}', [\App\Http\Controllers\SocialAuthController::class, 'redirectToProvider'])

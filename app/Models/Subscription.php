@@ -17,6 +17,8 @@ class Subscription extends Model
         'cancelled_at',
         'verification_code',
         'verification_code_expires_at',
+        'stripe_session_id',
+        'stripe_payment_intent_id',
     ];
 
     protected $casts = [

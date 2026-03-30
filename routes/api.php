@@ -11,6 +11,7 @@ use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\InteractiveSessionController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\QRCodeController;
@@ -71,6 +72,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/subscriptions/initiate', [SubscriptionController::class, 'initiate']);
     Route::post('/subscriptions/verify', [SubscriptionController::class, 'verify']);
     Route::post('/subscriptions/cancel', [SubscriptionController::class, 'cancel']);
+
+    // Stripe Payment (Checkout Session)
+    Route::post('/payment/checkout', [PaymentController::class, 'checkout']);
 
 
     // Floor Plans (Admin CRUD)
@@ -155,8 +159,8 @@ Route::middleware('auth:sanctum')->prefix('qr-codes')->group(function () {
     Route::get('/statistics/{exhibit}', [QRCodeController::class, 'statistics']);
 });
 
-// Stripe Webhook (no auth - verified by Stripe signature)
-Route::post('/stripe/webhook', [\App\Http\Controllers\Api\StripeWebhookController::class, 'handle']);
+// Stripe Webhook (no auth — signature verified inside PaymentController)
+Route::post('/payment/webhook', [PaymentController::class, 'webhook']);
 
 // Navigation Sessions (authenticated)
 Route::middleware('auth:sanctum')->prefix('navigation-sessions')->group(function () {
